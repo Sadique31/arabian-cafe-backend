@@ -9,7 +9,7 @@ const authMiddleware = (req, res, next) => {
   }
 
   try {
-    const verified = jwt.verify(token.replace("Bearer ", ""), "secretkey");
+    const verified = jwt.verify(token.replace("Bearer ", ""), process.env.JWT_SECRET);
     req.user = verified;
     next();
   } catch (error) {
