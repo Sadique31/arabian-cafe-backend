@@ -17,7 +17,7 @@ const app = express();
 ================================= */
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: "*",
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   })
@@ -46,7 +46,7 @@ app.get("/", (req, res) => {
   res.send("Backend Running 🚀");
 });
 
-const PORT = 5055;
+const PORT = process.env.PORT || 5055;
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
