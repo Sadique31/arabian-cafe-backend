@@ -4,8 +4,7 @@ const Razorpay = require("razorpay");
 const authMiddleware = require("../middleware/authMiddleware");
 const crypto = require("crypto");
 const Order = require("../models/Order");
-const Shop= require("../models/ShopSettings");
-
+const Shop = require("../models/ShopSettings");
 
 // 🔐 Razorpay instance (Test Keys use karo)
 const razorpay = new Razorpay({
@@ -27,13 +26,11 @@ router.post("/create-order", authMiddleware, async (req, res) => {
     const order = await razorpay.orders.create(options);
 
     res.status(200).json(order);
-
   } catch (error) {
     console.error("Razorpay Error:", error);
     res.status(500).json({ message: "Payment creation failed" });
   }
 });
-
 
 // 🔐 Verify Payment Signature (SECURITY UPGRADE)
 router.post("/verify-payment", authMiddleware, async (req, res) => {
@@ -42,7 +39,7 @@ router.post("/verify-payment", authMiddleware, async (req, res) => {
       razorpay_order_id,
       razorpay_payment_id,
       razorpay_signature,
-      orderDetails
+      orderDetails,
     } = req.body;
 
     const generated_signature = crypto
@@ -61,12 +58,14 @@ router.post("/verify-payment", authMiddleware, async (req, res) => {
       return res.status(403).json({ message: "Shop is currently closed" });
     }
 
-    // ✅ Payment verified → Save order
     const newOrder = new Order(orderDetails);
-    await newOrder.save();
+    const savedOrder = await newOrder.save();
+
+    // 🔥 REAL-TIME EMIT (ADD THIS)
+    const io = req.app.get("io");
+    io.emit("newOrder", savedOrder);
 
     res.status(200).json({ message: "Payment verified & order saved" });
-
   } catch (error) {
     console.error("Verification Error:", error);
     res.status(500).json({ message: "Verification failed" });

@@ -1,10 +1,12 @@
 require("dotenv").config();
 
-const productRoutes = require("./routes/productRoutes");
 const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
+const http = require("http");
+const { Server } = require("socket.io");
 
+const productRoutes = require("./routes/productRoutes");
 const orderRoutes = require("./routes/orderRoutes");
 const authRoutes = require("./routes/authRoutes");
 const shopRoutes = require("./routes/shopRoutes");
@@ -13,20 +15,19 @@ const paymentRoutes = require("./routes/paymentRoutes");
 const app = express();
 
 /* ================================
-   🔥 CORS MUST BE BEFORE ROUTES
+   CORS
 ================================= */
 app.use(
   cors({
     origin: "*",
     methods: ["GET", "POST", "PUT", "DELETE"],
-    credentials: true,
   })
 );
 
 app.use(express.json());
 
 /* ================================
-   🔥 ROUTES
+   ROUTES
 ================================= */
 app.use("/api/orders", orderRoutes);
 app.use("/api/auth", authRoutes);
@@ -35,7 +36,7 @@ app.use("/api/payment", paymentRoutes);
 app.use("/api/products", productRoutes);
 
 /* ================================
-   🔥 MONGO CONNECT
+   MONGO CONNECT
 ================================= */
 mongoose
   .connect(process.env.MONGO_URI)
@@ -46,21 +47,18 @@ app.get("/", (req, res) => {
   res.send("Backend Running 🚀");
 });
 
-/// naya change yaha hua hai 
-
-const http = require("http");
-const { Server } = require("socket.io");
+/* ================================
+   SOCKET SETUP (IMPORTANT)
+================================= */
 
 const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
     origin: "*",
-    methods: ["GET", "POST", "PUT", "DELETE"],
   },
 });
 
-// 🔥 Make io accessible in routes
 app.set("io", io);
 
 io.on("connection", (socket) => {
