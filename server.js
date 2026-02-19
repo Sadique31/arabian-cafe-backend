@@ -5,7 +5,7 @@ const cors = require("cors");
 const mongoose = require("mongoose");
 const http = require("http");
 const { Server } = require("socket.io");
-
+const rateLimit = require("express-rate-limit");
 const productRoutes = require("./routes/productRoutes");
 const orderRoutes = require("./routes/orderRoutes");
 const authRoutes = require("./routes/authRoutes");
@@ -17,15 +17,18 @@ const app = express();
 /* ================================
    CORS
 ================================= */
-app.use(
-  cors({
-    origin: "*",
-    methods: ["GET", "POST", "PUT", "DELETE"],
-  })
-);
+app.use(cors({
+  origin: ["https://arabian-cafe.netlify.app", "http://localhost:5173"],
+  methods: ["GET", "POST", "PUT", "DELETE"],
+}));
 
 app.use(express.json());
 
+app.use("/api/auth", rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  message: { message: "Too many attempts, please try after 15 minutes" }
+}));
 /* ================================
    ROUTES
 ================================= */

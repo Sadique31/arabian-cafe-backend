@@ -59,7 +59,7 @@ router.get("/", authMiddleware, adminMiddleware, async (req, res) => {
 GET ORDER HISTORY (Admin Only)
 ========================================
 */
-router.get("/history", authMiddleware, async (req, res) => {
+router.get("/history", authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const { date, search } = req.query;
 

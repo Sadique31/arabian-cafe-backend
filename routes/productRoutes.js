@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const Product = require("../models/Product");
 const authMiddleware = require("../middleware/authMiddleware");
-
+const adminMiddleware = require("../middleware/adminMiddleware"); // ✅ Ye line add karo
 /*
 ========================================
 GET ALL PRODUCTS (Public)
@@ -25,7 +25,7 @@ ADD PRODUCT (Admin Only)
 Future use – Inventory panel
 ========================================
 */
-router.post("/", authMiddleware, async (req, res) => {
+router.post("/", authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const newProduct = new Product(req.body);
     const savedProduct = await newProduct.save();
@@ -41,7 +41,7 @@ router.post("/", authMiddleware, async (req, res) => {
 UPDATE STOCK STATUS (Admin Only)
 ========================================
 */
-router.put("/:id/stock", authMiddleware, async (req, res) => {
+router.put("/:id/stock", authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const updatedProduct = await Product.findByIdAndUpdate(
       req.params.id,

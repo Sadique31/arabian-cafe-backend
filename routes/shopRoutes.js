@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const ShopSettings = require("../models/ShopSettings");
 const authMiddleware = require("../middleware/authMiddleware");
-
+const adminMiddleware = require("../middleware/adminMiddleware"); // ✅ Ye add karo
 
 // 🔹 GET Shop Status (Public)
 router.get("/status", async (req, res) => {
@@ -24,7 +24,7 @@ router.get("/status", async (req, res) => {
 
 
 // 🔹 UPDATE Shop Status (Admin Only)
-router.put("/status", authMiddleware, async (req, res) => {
+router.put("/status", authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const { isOpen } = req.body;
 
